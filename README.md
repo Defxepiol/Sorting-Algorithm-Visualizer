@@ -8,8 +8,8 @@ Run main
 # How to use it
 Press R to mix all values into random
 
-Press 1 to bubblesort
+Press 1 to bubble sort
 
 press 2 to insertion sort
 
-press 3 to mergesort
+press 3 to selection sort
