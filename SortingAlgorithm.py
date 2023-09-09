@@ -6,7 +6,7 @@ import random as rd
 class SortingAlgorithm:
     def __init__(self, window):
         self.window = window
-        self.w_size = 2
+        self.w_size = 10
         self.max_height = (RES[0]//self.w_size)
 
         self.lst = [i for i in range(1,self.max_height+1)]
@@ -14,80 +14,86 @@ class SortingAlgorithm:
         self.sorting = False
 
         self.font = pg.font.SysFont(None, 50)
-        self.c = 0
+        self.min_index = 0
+
+        self.bubble = self.bubble_sort()
+        self.inser = self.insertion_sort()
+        self.select = self.selection_sort()
 
     def current_lst(self):
         return self.lst
 
     def update(self):
         self.draw()
-        if self.sorting and self.current_sorting_alg == 'BUBBLESORT':
+        if self.current_sorting_alg == 'BUBBLESORT':
             try:
-                next(self.bubble_sort())
+                next(self.bubble)
             except StopIteration:
                 print(f"{self.current_sorting_alg} done")
                 self.current_sorting_alg = ''
                 self.sorting = False
-
-        if self.sorting and self.current_sorting_alg == 'INSERTIONSORT':
+                self.bubble = self.bubble_sort()
+        if self.current_sorting_alg == 'INSERTIONSORT':
             try:
-                next(self.insertion_sort())
+                next(self.inser)
             except StopIteration:
                 print(f"{self.current_sorting_alg} done")
                 self.current_sorting_alg = ''
                 self.sorting = False
+                self.inser = self.insertion_sort()
 
-        if self.sorting and self.current_sorting_alg == 'SELECTIONSORT':
+        if self.current_sorting_alg == 'SELECTIONSORT':
             try:
-                next(self.selection_sort())
+                next(self.select)
             except StopIteration:
                 print(f"{self.current_sorting_alg} done")
                 self.current_sorting_alg = ''
                 self.sorting = False
-
+                self.select = self.selection_sort()
+        
     def bubble_sort(self):
-        for j in range(len(self.lst)-1):
-            for i in range(j,len(self.lst)-1):
-                if self.lst[i+1] < self.lst[i]:
-                    tmp = self.lst[i+1]
-                    self.lst[i+1], self.lst[i] = self.lst[i], tmp
-                    pg.draw.rect(self.window, 'red',
-                                 ((i+1) * self.w_size, 0, self.w_size, self.lst[i] * self.w_size))
-                    yield True
-
+        self.sorting = True
+        for i in range(len(self.lst)-1):
+            for j in range(i+1,len(self.lst)):
+                if self.lst[j] < self.lst[i]:
+                    tmp = self.lst[i]
+                    self.lst[i] = self.lst[j]
+                    self.lst[j] = tmp
+                    pg.draw.rect(self.window, 'red',((j) * self.w_size, 0, self.w_size, self.lst[j] * self.w_size))
+                    yield 
+        self.sorting = False
         return self.lst
 
     def insertion_sort(self):
+        self.sorting = True
         for i in range(1,len(self.lst)):
             current = self.lst[i]
             d = i-1
             while d >= 0 and self.lst[d] > current:
-                self.lst[i], self.lst[d] = self.lst[d], current
-                pg.draw.rect(self.window, 'red',
-                             ((i) * self.w_size, 0, self.w_size, self.lst[d] * self.w_size))
+                pg.draw.rect(self.window, 'red',((d) * self.w_size, 0, self.w_size, self.lst[d] * self.w_size))
+                self.lst[d+1] = self.lst[d]
                 d -= 1
-                yield True
-
+                yield
+            self.lst[d+1] = current
+        self.sorting = False
         return self.lst
 
     def selection_sort(self):
-        for w in range(len(self.lst)):
-            _min = self.c
-            pg.draw.rect(self.window, 'green',
-                         ((_min) * self.w_size, 0, self.w_size, self.lst[_min] * self.w_size))
-            for s in range(self.c+1, len(self.lst)):
-                if self.lst[_min] > self.lst[s]:
-                    _min = s
-            self.lst[self.c], self.lst[_min] = self.lst[_min], self.lst[self.c]
-            pg.draw.rect(self.window, 'red',
-                         ((_min) * self.w_size, 0, self.w_size, self.lst[_min] * self.w_size))
-            if self.c == len(self.lst)-1:
-                self.c = 0
-                return self.lst
-            self.c += 1
-            yield True
-
-
+        self.sorting = True
+        for i in range(len(self.lst)):
+            min_index = i
+            pg.draw.rect(self.window, 'green',((min_index) * self.w_size, 0, self.w_size, self.lst[min_index] * self.w_size))
+            for j in range(i+1,len(self.lst)):
+                if self.lst[min_index] > self.lst[j]:
+                    min_index = j
+            pg.draw.rect(self.window, 'red',((min_index) * self.w_size, 0, self.w_size, self.lst[min_index] * self.w_size))
+            aux = self.lst[i]
+            self.lst[i] = self.lst[min_index]
+            self.lst[min_index] = aux
+            yield 
+        
+        self.sorting = False
+        return self.lst
 
     def draw(self, color='white'):
         t=self.font.render(str(self.current_sorting_alg),1,'black')
